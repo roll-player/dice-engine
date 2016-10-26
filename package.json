@@ -1,0 +1,35 @@
+{
+  "name": "dice-engine",
+  "version": "0.1.0",
+  "description": "A Dice Rolling Engine",
+  "main": "index.js",
+  "scripts": {
+    "test": "jest",
+    "build": "babel src -d lib",
+    "prepublish": "build"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/roll-player/dice-engine.git"
+  },
+  "keywords": [
+    "Dice",
+    "Engine"
+  ],
+  "author": "Michael Sarchet",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/roll-player/dice-engine/issues"
+  },
+  "homepage": "https://github.com/roll-player/dice-engine#readme",
+  "devDependencies": {
+    "babel": "^6.5.2",
+    "babel-cli": "^6.18.0",
+    "babel-preset-es2016": "^6.16.0",
+    "babel-preset-latest": "^6.16.0",
+    "jest": "^16.0.2"
+  },
+  "dependencies": {
+    "random-js": "^1.0.8"
+  }
+}
