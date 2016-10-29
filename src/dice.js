@@ -73,12 +73,11 @@ export default class Dice
     }
     // first determine which dice are the lowest dice
     let lowest = []
-
+    console.log('finding the ', count, 'lowest')
     this.rolledDice.forEach(die => {
-      if (die.invalid) {
+      if (die.invalid || count == 0) {
         return
       }
-
       for (var i = 0; i < count; i++) {
         if (lowest[i] == null || die.value < lowest[i]) {
           // if the array is full replace this one
@@ -92,9 +91,15 @@ export default class Dice
       }
     })
 
+    console.log('dropping', lowest)
+
     // enumerate through the dice once more dropping the first
     // of the lowest values that we find
     this.rolledDice.forEach(die => {
+      if (die.invalid) {
+        return
+      }
+
       // ideally we may wish to bail out for large rolls
       if (lowest.length === 0) {
         return
@@ -102,6 +107,7 @@ export default class Dice
 
       for (var i = 0; i < lowest.length; i++) {
         if (die.value <= lowest[i]) {
+          console.log('invalidating', die)
           die.Invalidate(InvalidReasons.DROPPED)
           // remove the item from the lowest collection
           lowest.splice(i, 1)
