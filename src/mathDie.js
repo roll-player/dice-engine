@@ -1,16 +1,22 @@
+import Value from './value'
+
 const getMathValues = (left, right) => {
     let leftValue = 0
     let rightValue = 0
+
+    if (!left || !right) {
+      throw new Nerror('Must provide both values to math')
+    }
     if (left.value) {
-      leftValue = left.value
+      leftValue = left
     } else {
-      leftValue = +left 
+      leftValue = new Value(left)
     }
 
     if (right.value) {
-      rightValue = right.value 
+      rightValue = right
     } else {
-      rightValue = +right
+      rightValue = new Value(right)
     }
 
   return { left: leftValue, right: rightValue }
@@ -31,5 +37,10 @@ export default class MathDie {
       case '-':
         return values.left - values.right
     }
+  }
+
+  toString () {
+    let values = getMathValues(this.left, this.right)
+    return `${values.left.toString()} ${this.token} ${values.right.toString()}`
   }
 }

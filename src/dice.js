@@ -124,6 +124,10 @@ export default class Dice
     this.drop(toDrop)
   }
 
+  toString (expanded = false) {
+    return this.value
+  }
+
   static createDice (number, sides) {
     return new Dice(number, sides)
   }
