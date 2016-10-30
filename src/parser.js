@@ -1,6 +1,6 @@
 import Dice from './dice'
 import MathDie from './mathDie'
-
+import Value from './value'
 const operatorTable = {
   'd' : {precedence: 0, args: 2},
   'k' : {precedence: 0, args: 2},
@@ -108,11 +108,13 @@ const evaluate = rpn => {
         case 'd':
           let sides = stack.pop()
           let number = stack.pop() || result || 1
-          number = number.value ? number.value : number
-          result = new Dice(+number, +sides)
+          result = new Dice(number, sides)
         case 'k':
         case 'v':
         case 'r':
+        case 'ro':
+        case 'r<':
+        case 'r>':
           // we don't need to add this dice to the stack since we care about the final result of the dice
           let value = stack.pop()
           let dice = stack.pop() || result
@@ -123,20 +125,46 @@ const evaluate = rpn => {
 
           switch (token) {
             case 'k':
-              dice.keep(value)
+              dice.keep(value, `k${value}`)
               break
             case 'v':
-              dice.drop(value)
+              dice.drop(value, `v${value}`)
               break
             case 'r':
-              dice.reroll(value)
+              dice.reroll([value], `r${value}`)
               break
+            case 'ro':
+              dice.reroll([value], true, `ro${value}`)
+              break
+            case 'r<':
+            case 'r>':
+              let values = []
+              switch (token) {
+                case 'r<':
+                  for (let i = 1; i <= value; i++) {
+                    values.push(i)
+                  }
+                  break
+                case 'r>':
+                  for (let j = value; j <= dice.sides; j++) {
+                    values.push(j) 
+                  }
+              }
+              dice.reroll(values, true), `${token}${value}`
           }
           break
       }
     }
     else {
       stack.push(token)
+    }
+  }
+
+  if (stack.length > 0) {
+    if (stack.length == 1) {
+      return new Value(stack.pop())
+    } else {
+      throw new Error('Unable to properly parse the input') 
     }
   }
 
@@ -163,17 +191,16 @@ const splitDice = input => {
 
     Promise.all(dicePromises)
       .then(rolls => {
-        if (foundSplitters.length === 0) {
+        if (!foundSplitters) {
           resolve(rolls[0]) 
           return
         }
 
         let mathDie = null
+
         foundSplitters.forEach(splitter => {
           let left = mathDie || rolls.shift()
           let right = rolls.shift()
-
-        console.log(mathDie)
           mathDie = new MathDie(left, right, splitter)
         })
 
@@ -188,7 +215,11 @@ export default class Parser {
     return splitDice(input)
   }
 
-  static RPN (input) {
+  static GetRPN (input) {
     return parse(input) 
+  }
+
+  static Evaluate (rpn) {
+    return evaluate(rpn) 
   }
 }

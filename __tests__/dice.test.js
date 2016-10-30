@@ -27,8 +27,8 @@ describe('Dice', () => {
   })
 
   it('should construct the correct number of dice', () => {
-    const dice = new Dice(2, 1)
-    expect(dice.number).toEqual(2)
+    const dice = new Dice(1, 1)
+    expect(dice.number).toEqual(1)
   })
 
   it('should construct dice with the correct number of sides', () => {
@@ -61,7 +61,7 @@ describe('Dice', () => {
       dice.rolledDice.forEach(die => {
         if (die.invalid) {
           expect(die.value).toEqual(1)
-          expect(die.reasons).toEqual([Dice.InvalidReasons.REROLL])
+          expect(die.reason).toEqual(Dice.InvalidReasons.REROLL)
         } else {
           expect(die.value).not.toEqual(1)
         }
@@ -76,7 +76,7 @@ describe('Dice', () => {
       dice.rolledDice.forEach(die => {
         if (die.value === 1) {
           expect(die.invalid).toEqual(true)
-          expect(die.reasons).toEqual([Dice.InvalidReasons.DROPPED])
+          expect(die.reason).toEqual(Dice.InvalidReasons.DROPPED)
         } else {
           expect(die.value).toEqual(6)
         }
@@ -94,7 +94,7 @@ describe('Dice', () => {
       dice.rolledDice.forEach(die => {
         if (die.value === 1) {
           expect(die.invalid).toEqual(true)
-          expect(die.reasons).toEqual([Dice.InvalidReasons.DROPPED])
+          expect(die.reason).toEqual(Dice.InvalidReasons.DROPPED)
         } else {
           expect(die.value).toEqual(6)
         }

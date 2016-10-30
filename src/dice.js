@@ -18,13 +18,24 @@ const InvalidReasons = {
 export default class Dice
 {
   constructor (number, sides) {
-    if (!isNumber(number) && !isNumber(sides)) {
-      throw new Error('Must provide numbers as arguments')
+    if (number.value) {
+      this.left = number 
+      number = number.value
+    }
+
+    if (sides.value) {
+      this.right = sides
+      sides = sides.value
+    }
+
+    if (!isNumber(+number) && !isNumber(+sides)) {
+      throw new Error('Must provide valid arguments')
     }
 
     this.type = 'dice'
-    this.number = number
-    this.sides = sides
+    this.number = +number
+    this.sides = +sides
+    this.rightString = ''
     this.rolledDice = makeDice(number, sides)
   }
 
@@ -38,16 +49,19 @@ export default class Dice
     }, 0)
   }
 
-  rerollOnce (values) {
+  rerollOnce (values, append = '') {
+    this.rightString += append
     this.reroll(values, true)
   }
 
   setDieInvalid (die, reason) {
     die.invalid = true
-    die.reasons.push(reason)
+    die.reason = reason
   }
 
-  reroll (values, once = false) {
+  reroll (values, once = false, append = '') {
+    this.rightString += append
+
     let checkReroll = true
     let rerollAttempts = 0
     do {
@@ -67,13 +81,14 @@ export default class Dice
     } while (checkReroll && rerollAttempts < 100)
   }
 
-  drop (count) {
+  drop (count, append = '') {
+    this.rightString += append
+
     if (count <= 0) {
       return
     }
     // first determine which dice are the lowest dice
     let lowest = []
-    console.log('finding the ', count, 'lowest')
     this.rolledDice.forEach(die => {
       if (die.invalid || count == 0) {
         return
@@ -91,7 +106,6 @@ export default class Dice
       }
     })
 
-    console.log('dropping', lowest)
 
     // enumerate through the dice once more dropping the first
     // of the lowest values that we find
@@ -107,7 +121,6 @@ export default class Dice
 
       for (var i = 0; i < lowest.length; i++) {
         if (die.value <= lowest[i]) {
-          console.log('invalidating', die)
           die.Invalidate(InvalidReasons.DROPPED)
           // remove the item from the lowest collection
           lowest.splice(i, 1)
@@ -118,14 +131,64 @@ export default class Dice
     }, this.rolledDice)
   }
 
-  keep (count) {
+  keep (count, append) {
     // a keep is just an inverse drop
     let toDrop = Math.max(this.number - count, 0)
-    this.drop(toDrop)
+    this.drop(toDrop, append)
   }
 
   toString (expanded = false) {
-    return this.value
+    let dieString = ''
+
+    if (this.left) {
+      dieString += `Value: ${this.left.value} -> ${this.left.toString(expanded)}`
+    } else {
+      dieString += this.number
+    }
+
+    dieString += 'd'
+
+    if (this.right) {
+      dieString += `Value: ${this.right.value} -> ${this.right.toString(expanded)}`
+    } else {
+      dieString += this.sides
+    }
+
+    dieString += this.rightString
+    if (!expanded) {
+      return this.value
+    }
+
+    let diceStrings = this.rolledDice.map(die => die.toString())
+
+    return `[ ${dieString} : ${diceStrings.join(' ')} ]`
+  }
+
+  get stats () {
+    return this.rolledDice.reduce((stats, die) => {
+      stats.totalRolled++
+      if (die.invalid) {
+        stats.invalid++
+        switch (die.reason) {
+          case InvalidReasons.DROPPED:
+            stats.dropped++
+            break
+          case InvalidReasons.REROLL:
+            stats.rerolled++
+            break
+        }
+      } else {
+        stats.valid++
+      }
+
+      return stats
+    }, {
+      totalRolled: 0,
+      valid: 0,
+      invalid: 0,
+      dropped: 0,
+      rerolled: 0
+    }) 
   }
 
   static createDice (number, sides) {

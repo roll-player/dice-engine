@@ -3,12 +3,20 @@ export default class Die {
     this.__value__ = value
     this.__sides__ = sides
     this.__invalid__ = false
-    this.__reasons__ = []
+    this.__reason__ = '' 
   }
 
   Invalidate (reason) {
     this.__invalid__ = true
-    this.__reasons__.push(reason)
+    this.__reason__ = reason
+  }
+
+  toString (expanded = true, child = true) {
+    if (this.invalid) {
+      return `[${this.reason} ${this.value}]` 
+    }
+
+    return `${this.value}`
   }
 
   get value () {
@@ -23,7 +31,8 @@ export default class Die {
     return this.__invalid__
   }
 
-  get reasons () {
-    return this.__reasons__
+  get reason () {
+    return this.__reason__
   }
+
 }

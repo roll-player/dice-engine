@@ -3,11 +3,11 @@ export default class Value {
     this.value = +value
   }
 
-  get value () {
-    return value
-  }
+  toString (expanded) {
+    if (!expanded) {
+      return this.value
+    }
 
-  toString () {
-    return value
+    return `[ ${this.value} ]` 
   }
 }

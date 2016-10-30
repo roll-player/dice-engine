@@ -5,7 +5,7 @@ const getMathValues = (left, right) => {
     let rightValue = 0
 
     if (!left || !right) {
-      throw new Nerror('Must provide both values to math')
+      throw new Error('Must provide both values to math')
     }
     if (left.value) {
       leftValue = left
@@ -26,12 +26,12 @@ export default class MathDie {
   constructor (left, right, token) {
     this.left = left
     this.right = right
-    this.token = token
+    this.operator = token
   }
 
   get value () {
     let values = getMathValues(this.left, this.right)
-    switch (this.token) {
+    switch (this.operator) {
       case '+':
         return values.left + values.right
       case '-':
@@ -39,8 +39,15 @@ export default class MathDie {
     }
   }
 
-  toString () {
+  toString (expanded = false) {
     let values = getMathValues(this.left, this.right)
-    return `${values.left.toString()} ${this.token} ${values.right.toString()}`
+
+    if (!expanded) {
+      console.log('value', this.value)
+      return '' + this.value
+    }
+
+    console.log('Getting math string')
+    return `[${values.left.toString(true)} ${this.operator} ${values.right.toString(true)}]`
   }
 }
