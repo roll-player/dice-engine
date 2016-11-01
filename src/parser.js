@@ -2,10 +2,10 @@ import Dice from './dice'
 import MathDie from './mathDie'
 import Value from './value'
 const operatorTable = {
-  'd' : {precedence: 0, args: 2},
-  'k' : {precedence: 0, args: 2},
-  'v' : {precedence: 0, args: 2},
-  'r' : {precedence: 0, args: 2}, 
+  'd': {precedence: 0, args: 2},
+  'k': {precedence: 0, args: 2},
+  'v': {precedence: 0, args: 2},
+  'r': {precedence: 0, args: 2},
   'ro': {precedence: 0, args: 2},
   'r<': {precedence: 0, args: 2},
   'r>': {precedence: 0, args: 2}
@@ -22,21 +22,21 @@ const parse = input => {
 
     let collected = []
 
-    while(index < tokenized.length) {
+    while (index < tokenized.length) {
       let token = tokenized[index]
 
-      if(!isOperator(token)) {
+      if (!isOperator(token)) {
         collected.push(token)
       } else {
-        if(collected.length > 0) {
+        if (collected.length > 0) {
           let join = collected.join('')
           collected = []
           joined.push(join)
         }
 
-        if(token == 'r') {
+        if (token === 'r') {
           let next = tokenized[index + 1]
-          if(next == 'o' || next == '<' || next == '>') {
+          if (next === 'o' || next === '<' || next === '>') {
             token += next
             index++
           }
@@ -48,7 +48,7 @@ const parse = input => {
       index++
     }
 
-    if(collected.length > 0) {
+    if (collected.length > 0) {
       let join = collected.join('')
       collected = []
       joined.push(join)
@@ -56,36 +56,38 @@ const parse = input => {
 
     tokenized = joined
 
-    let token = null 
+    let token = null
     let output = []
     let operators = []
     // start construction of the tree
-    while(token = tokenized.shift()) {
-      if(isOperator(token)) {
-
+    const getNextToken = () => tokenized.shift()
+    token = getNextToken()
+    while (token) {
+      if (isOperator(token)) {
         // this really should move all lower precendece operators off the stack
         // this isn't a problem since we have no grouping operations
         let checkTop = true
-        while(checkTop) {
+        while (checkTop) {
           let top = operators[operators.length - 1]
-          if(top != null && operatorTable[top].precedence <= operatorTable[token].precedence) {
+          if (top != null && operatorTable[top].precedence <= operatorTable[token].precedence) {
             output.push(/* top */ operators.pop())
-          } 
-          else {
+          } else {
             // we found a higher order operator so were going to stop checking
-            checkTop = false 
+            checkTop = false
           }
         }
         operators.push(token)
-        output.push(tokenized.shift() || 1)
+        output.push(getNextToken() || 1)
       } else {
         output.push(token)
       }
+
+      // get the next token
+      token = getNextToken()
     }
 
-    while(token = operators.pop()) {
-      output.push(token)
-    }
+    // flip the operators array and append it to the output
+    output = output.concat(operators.reverse())
 
     resolve(output)
   })
@@ -96,10 +98,9 @@ const isOperator = token => {
 }
 
 const evaluate = rpn => {
-  let operator = null
   let stack = []
 
-  let result = null 
+  let result = null
 
   for (var i = 0; i < rpn.length; i++) {
     let token = rpn[i]
@@ -109,6 +110,7 @@ const evaluate = rpn => {
           let sides = stack.pop()
           let number = stack.pop() || result || 1
           result = new Dice(number, sides)
+          break
         case 'k':
         case 'v':
         case 'r':
@@ -118,7 +120,7 @@ const evaluate = rpn => {
           // we don't need to add this dice to the stack since we care about the final result of the dice
           let value = stack.pop()
           let dice = stack.pop() || result
-          
+
           if (dice.type && dice.type !== 'dice') {
             throw new Error('Not a dice')
           }
@@ -147,24 +149,23 @@ const evaluate = rpn => {
                   break
                 case 'r>':
                   for (let j = value; j <= dice.sides; j++) {
-                    values.push(j) 
+                    values.push(j)
                   }
               }
               dice.reroll(values, true, `${token}${value}`)
           }
           break
       }
-    }
-    else {
+    } else {
       stack.push(token)
     }
   }
 
   if (stack.length > 0) {
-    if (stack.length == 1) {
+    if (stack.length === 1) {
       return new Value(stack.pop())
     } else {
-      throw new Error('Unable to properly parse the input') 
+      throw new Error('Unable to properly parse the input')
     }
   }
 
@@ -174,9 +175,9 @@ const evaluate = rpn => {
 const getDicePromise = diceString => {
   return new Promise((resolve, reject) => {
     parse(diceString)
-      .then(rpn =>  {
-          let evaluated = evaluate(rpn)
-          resolve(evaluated) 
+      .then(rpn => {
+        let evaluated = evaluate(rpn)
+        resolve(evaluated)
       })
       .catch(err => reject(err))
   })
@@ -192,7 +193,7 @@ const splitDice = input => {
     Promise.all(dicePromises)
       .then(rolls => {
         if (!foundSplitters) {
-          resolve(rolls[0]) 
+          resolve(rolls[0])
           return
         }
 
@@ -217,10 +218,10 @@ export default class Parser {
   }
 
   static GetRPN (input) {
-    return parse(input) 
+    return parse(input)
   }
 
   static Evaluate (rpn) {
-    return evaluate(rpn) 
+    return evaluate(rpn)
   }
 }
