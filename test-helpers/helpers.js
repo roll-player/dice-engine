@@ -72,7 +72,7 @@ export function toBeValue (util, customEqualityTests) {
       if (actual.value === expected.value) {
         return { pass: true, message: 'Value is correct' }
       } else {
-        return { pass: false, message: `Expected ${expected.value} got ${actual.value}`
+        return { pass: false, message: `Expected ${expected.value} got ${actual.value}` }
       }
     }
   }
