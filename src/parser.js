@@ -16,49 +16,49 @@ const parse = input => {
     // this currently requires two passes over the input
     // for now this is fine. Since most commands are small
     // this should be optimized at some point
-    let tokenized = input.split('');
-    let index = 0;
-    let joined = [];
+    let tokenized = input.split('')
+    let index = 0
+    let joined = []
 
-    let collected = [];
+    let collected = []
 
     while(index < tokenized.length) {
-      let token = tokenized[index];
+      let token = tokenized[index]
 
       if(!isOperator(token)) {
-        collected.push(token);
+        collected.push(token)
       } else {
         if(collected.length > 0) {
-          let join = collected.join('');
-          collected = [];
-          joined.push(join);
+          let join = collected.join('')
+          collected = []
+          joined.push(join)
         }
 
         if(token == 'r') {
-          let next = tokenized[index + 1];
+          let next = tokenized[index + 1]
           if(next == 'o' || next == '<' || next == '>') {
-            token += next;
-            index++;
+            token += next
+            index++
           }
         }
 
-        joined.push(token);
+        joined.push(token)
       }
 
-      index++;
+      index++
     }
 
     if(collected.length > 0) {
-      let join = collected.join('');
-      collected = [];
-      joined.push(join);
+      let join = collected.join('')
+      collected = []
+      joined.push(join)
     }
 
-    tokenized = joined;
+    tokenized = joined
 
-    let token = null; 
-    let output = [];
-    let operators = [];
+    let token = null 
+    let output = []
+    let operators = []
     // start construction of the tree
     while(token = tokenized.shift()) {
       if(isOperator(token)) {
@@ -67,28 +67,28 @@ const parse = input => {
         // this isn't a problem since we have no grouping operations
         let checkTop = true
         while(checkTop) {
-          let top = operators[operators.length - 1];
+          let top = operators[operators.length - 1]
           if(top != null && operatorTable[top].precedence <= operatorTable[token].precedence) {
-            output.push(/* top */ operators.pop());
+            output.push(/* top */ operators.pop())
           } 
           else {
             // we found a higher order operator so were going to stop checking
-            checkTop = false; 
+            checkTop = false 
           }
         }
-        operators.push(token);
-        output.push(tokenized.shift() || 1);
+        operators.push(token)
+        output.push(tokenized.shift() || 1)
       } else {
-        output.push(token);
+        output.push(token)
       }
     }
 
     while(token = operators.pop()) {
-      output.push(token);
+      output.push(token)
     }
 
-    resolve(output);
-  });
+    resolve(output)
+  })
 }
 
 const isOperator = token => {
@@ -96,7 +96,7 @@ const isOperator = token => {
 }
 
 const evaluate = rpn => {
-  let operator = null;
+  let operator = null
   let stack = []
 
   let result = null 
@@ -150,7 +150,7 @@ const evaluate = rpn => {
                     values.push(j) 
                   }
               }
-              dice.reroll(values, true), `${token}${value}`
+              dice.reroll(values, true, `${token}${value}`)
           }
           break
       }
@@ -196,12 +196,13 @@ const splitDice = input => {
           return
         }
 
-        let mathDie = null
+        let mathDie = new MathDie()
+
+        mathDie.addValue(rolls.shift())
 
         foundSplitters.forEach(splitter => {
-          let left = mathDie || rolls.shift()
-          let right = rolls.shift()
-          mathDie = new MathDie(left, right, splitter)
+          let value = rolls.shift()
+          mathDie.addValue(value, splitter)
         })
 
         resolve(mathDie)

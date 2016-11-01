@@ -1,6 +1,10 @@
 export default class Value {
-  constructor(value) {
+  constructor (value) {
     this.value = +value
+  }
+
+  get input () {
+    return this.value
   }
 
   toString (expanded) {
@@ -8,6 +12,14 @@ export default class Value {
       return this.value
     }
 
-    return `[ ${this.value} ]` 
+    return `[ ${this.value} ]`
+  }
+
+  static ensure (value) {
+    if (value.value) {
+      return value
+    } else {
+      return new Value(value)
+    }
   }
 }

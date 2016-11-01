@@ -59,3 +59,21 @@ export function toHaveDice (util, customEqualityTests) {
     } 
   }
 }
+
+export function toBeValue (util, customEqualityTests) {
+  return {
+    compare: (actual, expected) => {
+      expected = expected || {}
+
+      if (!actual.value) {
+        return { pass: false, message: 'Expected type to be Value' }
+      }
+
+      if (actual.value === expected.value) {
+        return { pass: true, message: 'Value is correct' }
+      } else {
+        return { pass: false, message: `Expected ${expected.value} got ${actual.value}`
+      }
+    }
+  }
+}

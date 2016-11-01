@@ -6,7 +6,8 @@
   "scripts": {
     "test": "jest",
     "build": "babel src -d lib",
-    "prepublish": "npm run build"
+    "prepublish": "npm run build",
+    "lint": "standard src/**/*.js --fix"
   },
   "repository": {
     "type": "git",
@@ -27,7 +28,8 @@
     "babel-cli": "^6.18.0",
     "babel-preset-es2016": "^6.16.0",
     "babel-preset-latest": "^6.16.0",
-    "jest": "^16.0.2"
+    "jest": "^16.0.2",
+    "standard": "^8.5.0"
   },
   "dependencies": {
     "random-js": "^1.0.8"

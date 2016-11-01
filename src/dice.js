@@ -1,6 +1,7 @@
 import { isNumber } from 'lodash'
 import Die from './die'
 import Random from 'random-js'
+import Value from './value'
 
 const engine = Random.engines.mt19937().autoSeed()
 
@@ -19,7 +20,7 @@ export default class Dice
 {
   constructor (number, sides) {
     if (number.value) {
-      this.left = number 
+      this.left = number
       number = number.value
     }
 
@@ -82,21 +83,25 @@ export default class Dice
   }
 
   drop (count, append = '') {
+    count = Value.ensure(count)
+
     this.rightString += append
 
-    if (count <= 0) {
+    if (count.value <= 0) {
       return
     }
     // first determine which dice are the lowest dice
+
     let lowest = []
     this.rolledDice.forEach(die => {
-      if (die.invalid || count == 0) {
+      if (die.invalid || count.value === 0) {
         return
       }
-      for (var i = 0; i < count; i++) {
-        if (lowest[i] == null || die.value < lowest[i]) {
+
+      for (var i = 0; i < count.value; i++) {
+        if (lowest[i] === undefined || die.value < lowest[i]) {
           // if the array is full replace this one
-          if (lowest.length === count) {
+          if (lowest.length === count.value) {
             lowest[i] = die.value
           } else {
             lowest.push(die.value)
@@ -105,7 +110,6 @@ export default class Dice
         }
       }
     })
-
 
     // enumerate through the dice once more dropping the first
     // of the lowest values that we find
@@ -128,40 +132,14 @@ export default class Dice
           return
         }
       }
-    }, this.rolledDice)
+    })
   }
 
   keep (count, append) {
     // a keep is just an inverse drop
-    let toDrop = Math.max(this.number - count, 0)
+    count = Value.ensure(count)
+    let toDrop = Math.max(this.number - count.value, 0)
     this.drop(toDrop, append)
-  }
-
-  toString (expanded = false) {
-    let dieString = ''
-
-    if (this.left) {
-      dieString += `Value: ${this.left.value} -> ${this.left.toString(expanded)}`
-    } else {
-      dieString += this.number
-    }
-
-    dieString += 'd'
-
-    if (this.right) {
-      dieString += `Value: ${this.right.value} -> ${this.right.toString(expanded)}`
-    } else {
-      dieString += this.sides
-    }
-
-    dieString += this.rightString
-    if (!expanded) {
-      return this.value
-    }
-
-    let diceStrings = this.rolledDice.map(die => die.toString())
-
-    return `[ ${dieString} : ${diceStrings.join(' ')} ]`
   }
 
   get stats () {
@@ -188,7 +166,43 @@ export default class Dice
       invalid: 0,
       dropped: 0,
       rerolled: 0
-    }) 
+    })
+  }
+
+  diceInput (expanded) {
+    let dieString = ''
+
+    if (this.left) {
+      dieString += `${this.left.value} -> ${this.left.toString(expanded)}`
+    } else {
+      dieString += this.number
+    }
+
+    dieString += 'd'
+
+    if (this.right) {
+      dieString += `${this.right.value} -> ${this.right.toString(expanded)}`
+    } else {
+      dieString += this.sides
+    }
+
+    dieString += this.rightString
+
+    return dieString
+  }
+
+  get input () {
+    return this.diceInput(false)
+  }
+
+  toString (expanded = false) {
+    if (!expanded) {
+      return this.value
+    }
+
+    let diceStrings = this.rolledDice.map(die => die.toString())
+
+    return `[ ${this.diceInput(expanded)} : ${this.value} -> ${diceStrings.join(' ')} ]`
   }
 
   static createDice (number, sides) {
