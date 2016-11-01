@@ -18,7 +18,7 @@ const InvalidReasons = {
 
 export default class Dice
 {
-  constructor (number, sides) {
+  constructor (number, sides, roll = true) {
     if (number.value) {
       this.left = number
       number = number.value
@@ -37,7 +37,18 @@ export default class Dice
     this.number = +number
     this.sides = +sides
     this.rightString = ''
-    this.rolledDice = makeDice(number, sides)
+    this.rolledDice = []
+    this.__rolled__ = false
+
+    if (roll) {
+      this.roll()
+    }
+  }
+
+  roll () {
+    if (!this.__rolled__) {
+      this.rolledDice = makeDice(number, sides)
+    }
   }
 
   get value () {

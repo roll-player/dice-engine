@@ -29,6 +29,8 @@
     "babel-preset-es2016": "^6.16.0",
     "babel-preset-latest": "^6.16.0",
     "jest": "^16.0.2",
+    "proxyquire": "^1.7.10",
+    "sinon": "^1.17.6",
     "standard": "^8.5.0"
   },
   "dependencies": {
