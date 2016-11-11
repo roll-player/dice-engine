@@ -2,7 +2,7 @@
   "name": "dice-engine",
   "version": "0.1.0",
   "description": "A Dice Rolling Engine",
-  "main": "index.js",
+  "main": "./lib/parser.js",
   "scripts": {
     "test": "jest",
     "build": "babel src -d lib",
