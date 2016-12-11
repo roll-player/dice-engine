@@ -103,7 +103,10 @@ export default class Dice
     }
 
     // first determine which dice are the lowest dice
-    let lowest = this.rolledDice.map(die => die.value).sort().splice(0, count.value)
+    let lowest = this.rolledDice.filter(die => !die.invalid)
+      .map(die => die.value) 
+      .sort((a, b) => a - b)
+      .splice(0, count.value) 
 
     if (lowest.length != count.value) {
       throw new Error('Found incorrect number of dice')
