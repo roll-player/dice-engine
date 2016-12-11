@@ -1,4 +1,4 @@
-import Dice from '../src/dice'
+import { createDice } from '../src/dice'
 import Die from '../src/die'
 
 const getDiceValue = dice => {
@@ -18,49 +18,45 @@ const generateDice = (values, sides) => {
 }
 
 describe('Dice', () => {
-  beforeEach(() => {
-    sinon.stub(Die.proto
-  })
-
   it('should throw an error if constructed incorrectly', () => {
     try {
-      const dice = new Dice('1', '2') // eslint-disable-line
+      const dice = createDice('1', '2') // eslint-disable-line
     } catch (e) {
       expect(e.message).toEqual('Must provide numbers as arguments')
     }
   })
 
   it('should construct the correct number of dice', () => {
-    const dice = new Dice(1, 1)
+    const dice = createDice(1, 1)
     expect(dice.number).toEqual(1)
   })
 
   it('should construct dice with the correct number of sides', () => {
-    const dice = new Dice(2, 1)
+    const dice = createDice(2, 1)
     expect(dice.sides).toEqual(1)
   })
 
   it('should roll the correct amount of dice', () => {
-    const dice = new Dice(2, 1)
+    const dice = createDice(2, 1)
     expect(dice.rolledDice.length).toEqual(2)
   })
 
   describe('rolling', () => {
     it('should return the correct value for two one-side die', () => {
-      const dice = new Dice(2, 1)
+      const dice = createDice(2, 1)
       expect(dice.value).toEqual(2)
     })
 
-    it('should properly sum the rolled values', () => {
-      const dice = new Dice(6, 4)
+    it('should have the proper value', () => {
+      const dice = createDice(6, 4)
       let rolled = getDiceValue(dice)
       expect(dice.value).toEqual(rolled)
     })
 
     it('should reroll any dice that are in the target', () => {
-      const dice = new Dice(6, 6)
+      const dice = createDice(6, 6)
       dice.rolledDice = generateDice([1, 1, 1, 1, 1, 1], 6)
-      dice.reroll([1])
+      dice.reroll([1], 'r1')
 
       dice.rolledDice.forEach(die => {
         if (die.invalid) {

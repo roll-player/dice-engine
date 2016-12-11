@@ -34,6 +34,7 @@
     "standard": "^8.5.0"
   },
   "dependencies": {
-    "random-js": "^1.0.8"
+    "random-js": "^1.0.8",
+    "sinon": "^1.17.6"
   }
 }

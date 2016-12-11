@@ -47,7 +47,7 @@ export default class Dice
 
   roll () {
     if (!this.__rolled__) {
-      this.rolledDice = makeDice(number, sides)
+      this.rolledDice = makeDice(this.number, this.sides)
     }
   }
 
@@ -74,8 +74,10 @@ export default class Dice
   reroll (values, once = false, append = '') {
     this.rightString += append
 
-    let checkReroll = true
     let rerollAttempts = 0
+
+    let checkReroll = false
+
     do {
       let additionalRolls = this.rolledDice.reduce((count, die) => {
         if (!die.invalid && values.indexOf(die.value) !== -1) {
@@ -86,9 +88,14 @@ export default class Dice
         return count
       }, 0)
 
-      this.rolledDice = this.rolledDice.concat(makeDice(additionalRolls, this.sides))
+      let rerolled = additionalRolls > 0
 
-      checkReroll = additionalRolls > 0 && !once
+      if (rerolled) {
+        this.rolledDice = this.rolledDice.concat(makeDice(additionalRolls, this.sides))
+      }
+
+      checkReroll = rerolled && !once
+
       rerollAttempts++
     } while (checkReroll && rerollAttempts < 100)
   }
@@ -98,52 +105,44 @@ export default class Dice
 
     this.rightString += append
 
-    if (count.value <= 0) {
+    if (count.value === 0) {
       return
     }
-    // first determine which dice are the lowest dice
 
-    let lowest = []
-    this.rolledDice.forEach(die => {
+    if (count.value < 0) {
+      throw new Error('Can not drop a value less than 0')
+    }
+
+    if (count.value >= this.number) {
+      throw new Error('Can not drop more dice than rolled')
+    }
+
+    // first determine which dice are the lowest dice
+    let lowestIndecies = []
+    this.rolledDice.forEach((die, index) => {
       if (die.invalid || count.value === 0) {
         return
       }
 
       for (var i = 0; i < count.value; i++) {
-        if (lowest[i] === undefined || die.value < lowest[i]) {
+        let lowestIndex = lowestIndecies[i]
+        if (lowestIndex === undefined || die.value < this.rolledDice[lowestIndex]) {
           // if the array is full replace this one
-          if (lowest.length === count.value) {
-            lowest[i] = die.value
+          if (lowestIndecies.length === count.value) {
+            lowestIndecies[i] = index
           } else {
-            lowest.push(die.value)
+            lowestIndecies.push(index)
           }
           return
         }
       }
     })
 
-    // enumerate through the dice once more dropping the first
-    // of the lowest values that we find
-    this.rolledDice.forEach(die => {
-      if (die.invalid) {
-        return
-      }
-
-      // ideally we may wish to bail out for large rolls
-      if (lowest.length === 0) {
-        return
-      }
-
-      for (var i = 0; i < lowest.length; i++) {
-        if (die.value <= lowest[i]) {
-          die.Invalidate(InvalidReasons.DROPPED)
-          // remove the item from the lowest collection
-          lowest.splice(i, 1)
-          // stop enumerating over the lowest
-          return
-        }
-      }
+    // enumerate over the found indecies and invalidate those dice
+    lowestIndecies.forEach(dieIndex => {
+      this.rolledDice[dieIndex].Invalidate(InvalidReasons.DROPPED)
     })
+
   }
 
   keep (count, append) {
