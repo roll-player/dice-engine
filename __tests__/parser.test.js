@@ -62,6 +62,16 @@ describe('Parser', () => {
 
       return rollPromise
     })
+
+    it('should handle large drops', () => {
+      const rollPromise = Parser.Parse('100d100v50')
+
+      rollPromise.then(roll => {
+        expect(roll).toHaveDice({ valid: 50, dropped: 50 })
+      })
+
+      return rollPromise
+    })
   })
 
   describe('Combined Rolls', () => {
