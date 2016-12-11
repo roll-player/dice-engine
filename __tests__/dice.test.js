@@ -18,10 +18,6 @@ const generateDice = (values, sides) => {
 }
 
 describe('Dice', () => {
-  beforeEach(() => {
-    sinon.stub(Die.proto
-  })
-
   it('should throw an error if constructed incorrectly', () => {
     try {
       const dice = new Dice('1', '2') // eslint-disable-line

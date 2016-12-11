@@ -47,7 +47,7 @@ export default class Dice
 
   roll () {
     if (!this.__rolled__) {
-      this.rolledDice = makeDice(number, sides)
+      this.rolledDice = makeDice(this.number, this.sides)
     }
   }
 
