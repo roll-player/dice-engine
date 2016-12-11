@@ -34,7 +34,7 @@ describe('Parser', () => {
       const rollPromise = Parser.Parse('4d6k3')
 
       rollPromise.then(roll => {
-        expect(roll).toHaveDice({ totalRolled: 4, dropped: 1, valid: 3})
+        expect(roll).toHaveDice({totalRolled: 4, dropped: 1, valid: 3})
       }).catch(err => console.error(err))
 
 

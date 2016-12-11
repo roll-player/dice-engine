@@ -104,23 +104,30 @@ export default class Dice
     // first determine which dice are the lowest dice
 
     let lowest = []
+
     this.rolledDice.forEach(die => {
       if (die.invalid || count.value === 0) {
         return
       }
 
       for (var i = 0; i < count.value; i++) {
-        if (lowest[i] === undefined || die.value < lowest[i]) {
-          // if the array is full replace this one
-          if (lowest.length === count.value) {
-            lowest[i] = die.value
-          } else {
+        if (lowest[i] === undefined) {
+            // we haven't found enough low dice so this is one
             lowest.push(die.value)
-          }
-          return
+            return
+        }
+
+        if (die.value < lowest[i]) {
+            // we're less than the current die, replace
+            lowest[i] = die.value
+            return
         }
       }
     })
+
+    if (lowest.length > count.value) {
+      throw new Error('Found to many die for roll')
+    }
 
     // enumerate through the dice once more dropping the first
     // of the lowest values that we find
@@ -137,10 +144,9 @@ export default class Dice
       for (var i = 0; i < lowest.length; i++) {
         if (die.value <= lowest[i]) {
           die.Invalidate(InvalidReasons.DROPPED)
-          // remove the item from the lowest collection
           lowest.splice(i, 1)
-          // stop enumerating over the lowest
-          return
+          // we don't need to check this die any longer
+          break
         }
       }
     })
@@ -156,8 +162,10 @@ export default class Dice
   get stats () {
     return this.rolledDice.reduce((stats, die) => {
       stats.totalRolled++
+
       if (die.invalid) {
         stats.invalid++
+
         switch (die.reason) {
           case InvalidReasons.DROPPED:
             stats.dropped++
